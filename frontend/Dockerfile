@@ -1,22 +1,12 @@
-# Stage 1: Build React app with Vite
-FROM node:24-alpine AS builder
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci
-
-COPY . .
-RUN npm run build
-
-# Stage 2: Serve with Nginx
+# Production Dockerfile for Frontend (Vanilla HTML / CSS / JS)
 FROM nginx:1.27-alpine
 
-# Copy custom nginx config
+# Custom Nginx config (SPA routing + API proxy)
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy built React app
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Static assets - no build step needed!
+COPY index.html style.css app.js /usr/share/nginx/html/
+COPY public/ /usr/share/nginx/html/public/
 
 EXPOSE 80
 

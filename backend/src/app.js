@@ -57,7 +57,17 @@ function createApp() {
   // NOTE: Uploaded files are NOT served as static assets.
   // They are accessed only via /api/receipts/:id/download (authenticated + ownership check).
 
-  // 404 and error handling
+  // Serve the frontend static files (plain HTML/CSS/JS, no build needed)
+  const frontendPath = path.join(__dirname, '..', '..', 'frontend');
+  app.use(express.static(frontendPath));
+
+  // For any non-API route, serve index.html (SPA hash routing)
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+
+  // 404 and error handling (for API routes only)
   app.use(notFoundHandler);
   app.use(errorHandler);
 
